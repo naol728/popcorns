@@ -21,10 +21,9 @@ const tempMovieData = [
     Year: "2019",
     Poster:
       "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-];
+  },]
 
-const tempWatchedData = [
+const  tempWatchedData= [
   {
     imdbID: "tt1375666",
     Title: "Inception",
@@ -46,11 +45,37 @@ const tempWatchedData = [
     userRating: 9,
   },
 ];
-
+const key="b481392d"
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
+  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+  const[isloading,setIsloading]=useState(false)
+   const[error,setError]=useState("")
+   useEffect(function (){
+    setIsloading(true)
+ async function fetchmovies(){
+   try {
+    const res=await fetch(`http://www.omdbapi.com/?apikey=${key}&s=mmmmmmm`)
+   const data=await res.json()
+   if(!res.ok){
+    throw new Error ("something is wrong check your conncetion")
+   }
+   console.log(data)
+   if(data.Response==="False") throw new Error ("movie is not found")
+   setMovies(data.Search)
+   
+  
+  }
+  catch(err){
+  console.log(err.message)
+  setError(err.message)
+  }finally{
+    setIsloading(false)
+  }
+}
+  fetchmovies()
+ },[])
   return (
     <>
     
@@ -61,10 +86,14 @@ export default function App() {
    </Navbar>
     <Main> 
        <Box>
-           <Movielist movies={movies} />
+           {/* {isloading ? <Loading/>:<Movielist movies={movies} />} */}
+           {isloading && <Loading />}
+           {!isloading && !error && <Movielist movies={movies} /> }
+           {error && <Errormessage message={error} />}
        </Box>
        <Box>
             <Watchedsummery  watched={watched}/>
+
             <WatchedMovielist  watched={watched} />
        </Box>
     </Main>
@@ -72,6 +101,17 @@ export default function App() {
   );
 }
 
+function Loading(){
+  return <p className='loader'>Loading...</p>
+}
+
+
+
+function Errormessage({message}){
+  return <p className='error'>
+    <span>{message}</span>
+  </p>
+}
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
@@ -127,7 +167,7 @@ function Movielist({movies}){
   return   <ul className="list">
   {movies?.map((movie) => (
      
-     <Movie movie={movie} />
+     <Movie movie={movie}  key={Movie.imdbID}/>
   ))}
 </ul>
 }
@@ -174,7 +214,7 @@ function Watchedsummery({watched}){
 function WatchedMovielist({watched}){
   return   <ul className="list">
   {watched.map((movie) => (
-    <Watchedmovies movie={watched} key={watched.imdbID}/>
+    <Watchedmovies movie={watched} key={movie.imdbID}/>
   ))}
 </ul>
 }
