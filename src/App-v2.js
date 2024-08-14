@@ -203,11 +203,11 @@ console.log(title,movie)
       }
       getMovies()
     }
- ,[] )
+ ,[selectedId] )
   return <div className='details'>
     <header>
       <button className='btn-back' onClick={onclose}>&larr;</button>
-      {selectedId}
+      
       <img src={poster} alt={`poster of ${movie} movie`} />
       <div className='details-overview'>
 <h2>{title}</h2>
@@ -220,7 +220,10 @@ console.log(title,movie)
       </header>
 
       <section>
-        <Starrating />
+        <div className='rating'>
+        <Starrating maxRating={10}  size={24}/>
+        </div>
+       
         <p>
           <em>{Plot}</em>
         </p>
